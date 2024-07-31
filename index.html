@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contributors</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20210206/pngtree-blue-green-glow-light-effect-blur-background-image_556767.jpg');
+        background-position: center;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      #contributor-tree {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .contributor,
+      .center-contributor {
+        position: absolute;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: rgb(255, 255, 255);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        transition: transform 0.3s;
+        border: 4px rgb(37, 205, 22) groove;
+      }
+      
+      .center-contributor {
+        border: 4px rgb(255, 0, 98) groove;
+      }
+
+      .contributor:hover {
+        transform: scale(1.3);
+        z-index: 10;
+      }
+
+      .contributor img,
+      .center-contributor img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .contributor-content,
+      .center-contributor-content {
+        position: absolute;
+        background-color: rgba(60, 97, 48, 0.692);
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        display: none;
+        text-align: left;
+        font-size: xx-small;
+      }
+
+      .contributor:hover .contributor-content {
+        display: block;
+      }
+
+      .center-contributor {
+        width: 200px;
+        height: 200px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .line {
+        position: absolute;
+        background-color: rgb(9, 60, 56);
+        transform-origin: 0 0;
+        z-index: -100;
+      }
+
+      .filler {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="contributor-tree"></div>
+      <div class="center-contributor" >
+        <img
+          src="MinePy.jpg"
+          alt="My Contributions"
+        />
+        <div class="center-contributor-content">My Contributions</div>
+      </div>
+      <div class="filler"></div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const contributors = [
+          {
+            id: 1,
+            name: "Chandan",
+            img: "Chandu.JPG",
+            content: "Frontend Developer",
+          },
+          {
+            id: 2,
+            name: "Deekshitha",
+            img: "Deeku.jpg",
+            content: "Frontend Developer",
+          },
+          {
+            id: 3,
+            name: "Charlie",
+            img: "https://via.placeholder.com/150",
+            content: "Frontend Developer",
+          },
+          {
+            id: 4,
+            name: "Dave",
+            img: "https://via.placeholder.com/150",
+            content: "Frontend Developer",
+          },
+          {
+            id: 4,
+            name: "Dave",
+            img: "https://via.placeholder.com/150",
+            content: "Idea Pitching",
+          },
+          // Add more contributors as needed
+        ];
+
+        const treeContainer = document.getElementById("contributor-tree");
+        const placedContributors = [];
+        const centerCircleRadius = 100; // Half of the diameter of the center circle
+        const buffer = 50; // Extra space around circles to prevent edge touching
+
+        const isOverlapping = (x, y, size) => {
+          const halfSize = size / 2;
+          const centerX = treeContainer.clientWidth / 2;
+          const centerY = treeContainer.clientHeight / 2;
+          const distFromCenter = Math.sqrt(
+            (x - centerX) ** 2 + (y - centerY) ** 2
+          );
+
+          if (distFromCenter < centerCircleRadius + halfSize + buffer) {
+            return true; // Overlaps with the center circle
+          }
+
+          return placedContributors.some((contributor) => {
+            const dx = contributor.x - x;
+            const dy = contributor.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < contributor.size / 2 + size / 2 + buffer;
+          });
+        };
+
+        const placeContributor = (contributor) => {
+          let size, x, y;
+          let attempts = 0;
+          const maxAttempts = 100;
+          const containerWidth = treeContainer.clientWidth;
+          const containerHeight = treeContainer.clientHeight;
+
+          do {
+            size = Math.random() * 60 + 60; // Adjust size range if needed
+            x = Math.random() * (containerWidth - size - 2 * buffer) + buffer;
+            y = Math.random() * (containerHeight - size - 2 * buffer) + buffer;
+            attempts++;
+          } while (isOverlapping(x, y, size) && attempts < maxAttempts);
+
+          if (attempts < maxAttempts) {
+            const percentX = (x / containerWidth) * 100;
+            const percentY = (y / containerHeight) * 100;
+            placedContributors.push({ x, y, size });
+
+            const contributorDiv = document.createElement("div");
+            contributorDiv.className = "contributor";
+            contributorDiv.style.width = `${size}px`;
+            contributorDiv.style.height = `${size}px`;
+            contributorDiv.style.left = `${percentX}%`;
+            contributorDiv.style.top = `${percentY}%`;
+
+            const img = document.createElement("img");
+            img.src = contributor.img;
+            img.alt = contributor.name;
+
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "contributor-content";
+            contentDiv.innerText = `${contributor.name}\n${contributor.content}`;
+
+            contributorDiv.appendChild(img);
+            contributorDiv.appendChild(contentDiv);
+            treeContainer.appendChild(contributorDiv);
+
+            // Add connecting line
+            const centerX = containerWidth / 2;
+            const centerY = containerHeight / 2;
+            const elemX = x + size / 2;
+            const elemY = y + size / 2;
+            const length = Math.sqrt(
+              (elemX - centerX) ** 2 + (elemY - centerY) ** 2
+            );
+            const angle =
+              (Math.atan2(elemY - centerY, elemX - centerX) * 180) / Math.PI;
+
+            const line = document.createElement("div");
+            line.className = "line";
+            line.style.width = `${length}px`;
+            line.style.height = `2px`;
+            line.style.left = `${centerX}px`;
+            line.style.top = `${centerY}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+
+            treeContainer.appendChild(line);
+
+            console.log(
+              `Placed ${contributor.name} at (${percentX}%, ${percentY}%) with size ${size}px`
+            );
+          } else {
+            console.warn(
+              `Could not place ${contributor.name} after ${maxAttempts} attempts`
+            );
+          }
+        };
+
+        contributors.forEach(placeContributor);
+      });
+    </script>
+  </body>
+</html>
